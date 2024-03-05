@@ -1,0 +1,16 @@
+{
+  "name": "learning-assistant",
+  "version": "1.0.0",
+  "description": "small app for teachers to improve their experience",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "tutor",
+    "helper",
+    "organizer"
+  ],
+  "author": "Ervin Apkeliamov, Ibrim Ganiev",
+  "license": "ISC"
+}
