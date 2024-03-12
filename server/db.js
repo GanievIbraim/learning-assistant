@@ -1,6 +1,6 @@
-import { Sequelize } from "sequelize";
+const { Sequelize } = require("sequelize");
 
-export default new Sequelize(
+module.exports = new Sequelize(
   "lAssistent", // Название базы данных
   "root", // Пользователь базы данных
   "Wersia1797", // Пароль от БД

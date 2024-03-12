@@ -1,9 +1,8 @@
 const express = require("express");
-const sequelize = require("./db").default;
-const models = require("./models/models").default.default;
+const sequelize = require("./db");
+const models = require("./models/models");
 const router = require("./routes/index");
 const cors = require("cors");
-// import cors from "cors";
 const cokieParser = require("cookie-parser");
 
 const app = express();

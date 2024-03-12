@@ -1,7 +1,7 @@
-import { define } from "../db";
-import { DataTypes } from "sequelize";
+const sequelize = require("../db");
+const { DataTypes } = require("sequelize");
 
-const User = define("User", {
+const User = sequelize.define("User", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -34,14 +34,18 @@ const User = define("User", {
   },
 });
 
-const ProductCategory = define("Product_Category", {
+const Card = sequelize.define("Card", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
   },
-  name: {
-    type: DataTypes.STRING(45),
+  text: {
+    type: DataTypes.STRING(200),
+    allowNull: false,
+  },
+  translation: {
+    type: DataTypes.STRING(200),
     allowNull: false,
   },
   icon: {
@@ -49,10 +53,31 @@ const ProductCategory = define("Product_Category", {
   },
 });
 
-// Связь между таблицами User и Order
-User.hasMany(Order, { as: "orders", foreignKey: "user_id" });
-Order.belongsTo(User, { foreignKey: "user_id" });
+const Block = sequelize.define("Block", {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  description: {
+    type: DataTypes.STRING(1000),
+    allowNull: false,
+  },
+  icon: {
+    type: DataTypes.STRING(200),
+  },
+});
 
-export default {
+// Связь между таблицами User и Block
+User.hasMany(Block, { as: "blocks", foreignKey: "blockId" });
+Block.belongsTo(User, { foreignKey: "userId" });
+
+// связь между Block и Card
+Block.hasMany(Card, { as: "cards", foreignKey: "cardId" });
+Card.belongsTo(Block, { foreignKey: "blockId" });
+
+module.exports = {
   User,
+  Card,
+  Block,
 };
