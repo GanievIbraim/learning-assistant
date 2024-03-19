@@ -69,11 +69,11 @@ const Block = sequelize.define("Block", {
 });
 
 // Связь между таблицами User и Block
-User.hasMany(Block, { as: "blocks", foreignKey: "blockId" });
+User.hasMany(Block, { as: "blocks", foreignKey: "userId" });
 Block.belongsTo(User, { foreignKey: "userId" });
 
 // связь между Block и Card
-Block.hasMany(Card, { as: "cards", foreignKey: "cardId" });
+Block.hasMany(Card, { as: "cards", foreignKey: "blockId" });
 Card.belongsTo(Block, { foreignKey: "blockId" });
 
 module.exports = {
