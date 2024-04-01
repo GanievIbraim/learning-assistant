@@ -1,4 +1,4 @@
-const { User } = require("../../models/models").default.default;
+const { User } = require("../../models/models");
 
 class LogoutController {
   async handleLogout(req, res) {

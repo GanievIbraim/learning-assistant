@@ -1,4 +1,6 @@
-const { User } = require("../../models/models").default.default;
+const {
+  User
+} = require("../../models/models");
 
 class UserController {
   async deleteUserById(req, res) {
@@ -6,18 +8,18 @@ class UserController {
     try {
       const result = await User.destroy({
         where: {
-          id: Number(id),
-        },
+          id: Number(id)
+        }
       });
       if (result) {
         console.log(`Пользователь с ID ${id} успешно удален.`);
-        res.json(result);
+        res.json(result)
       } else {
         console.log(`Пользователь с ID ${id} не найден.`);
-        res.json(result);
+        res.json(result)
       }
     } catch (error) {
-      console.error("Произошла ошибка при удалении пользователя:", error);
+      console.error('Произошла ошибка при удалении пользователя:', error);
     }
   }
   async update(req, res) {
@@ -27,19 +29,17 @@ class UserController {
 
       const foundUser = await User.findOne({
         where: {
-          id: userId,
+          id: userId
         },
       });
 
-      if (!foundUser)
-        return res.status(404).json({
-          message: "Пользователь не найден",
-        });
+      if (!foundUser) return res.status(404).json({
+        "message": "Пользователь не найден"
+      });
 
       for (var param in userData) {
-        if (userData[param] == false) {
-          foundUser[param] = "-";
-        } else foundUser[param] = userData[param];
+        if (userData[param] == false) { foundUser[param] = "-" }
+        else foundUser[param] = userData[param]
       }
 
       foundUser.save();
@@ -47,8 +47,8 @@ class UserController {
       return res.json(foundUser);
     } catch (err) {
       res.status(404).send({
-        message: err,
-      });
+        'message': err
+      })
     }
   }
 
@@ -58,24 +58,23 @@ class UserController {
 
       const foundUser = await User.findOne({
         where: {
-          id: userId,
+          id: userId
         },
       });
 
-      if (!foundUser)
-        return res.status(404).json({
-          message: "Пользователь не найден",
-        });
+      if (!foundUser) return res.status(404).json({
+        "message": "Пользователь не найден"
+      });
 
-      const { password, refreshToken, createdAt, updatedAt, ...userData } =
-        foundUser.dataValues;
+      const { password, refreshToken, createdAt, updatedAt, ...userData } = foundUser.dataValues
       return res.json(userData);
     } catch (err) {
       res.status(404).send({
-        message: err,
-      });
+        'message': err
+      })
     }
   }
+
 }
 
 module.exports = new UserController();
