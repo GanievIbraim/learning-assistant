@@ -1,5 +1,5 @@
 const { Card } = require("../models/models");
-const { badRequest } = "../error/ApiError";
+const { badRequest } = require("../error/ApiError");
 
 class cardController {
   async create(req, res, next) {
@@ -12,8 +12,10 @@ class cardController {
         translation,
         blockId: Number(blockId),
       });
-
-      return res.json(card);
+      const response = {
+        data: card
+      };
+      return res.status(200).json(response);
     } catch (e) {
       next(badRequest(e.message));
     }
@@ -23,7 +25,13 @@ class cardController {
     const cards = await Card.findAll({
       attributes: ["text", "icon", "translation", "id"],
     });
-    return res.json(cards);
+    if (cards.length === 0){
+      return res.status(200).json({message: "No cards found"});
+    } 
+    const response = {
+      data: cards
+    };
+    return res.status(200).json(response);
   }
 
   async getOne(req, res) {
@@ -36,7 +44,7 @@ class cardController {
     if (!card) {
       return res.status(404).json({ error: "Карточка не найдена" });
     }
-    return res.json(card);
+    return res.status(200).json(card);
   }
 
   async getByBlock(req, res) {
@@ -49,7 +57,7 @@ class cardController {
     if (!cards) {
       return res.status(404).json({ error: "Карточки не найдены" });
     }
-    return res.json(cards);
+    return res.status(200).json(cards);
   }
 
   async deleteItem(req, res) {
@@ -59,7 +67,7 @@ class cardController {
         id,
       },
     });
-    return res.json(card);
+    return res.status(200).json(card);
   }
 
   async updateItem(req, res, next) {
@@ -83,7 +91,7 @@ class cardController {
         return res.status(404).send({ error: "Карточка не найдена" });
       }
 
-      return res.json(updated);
+      return res.status(200).json(updated);
     } catch (e) {
       next(badRequest(e.message));
     }

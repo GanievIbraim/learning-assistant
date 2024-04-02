@@ -1,5 +1,5 @@
 const { Block } = require("../models/models");
-const { badRequest } = "../error/ApiError";
+const { badRequest } = require("../error/ApiError");
 
 class blockController {
   async create(req, res, next) {
@@ -11,8 +11,10 @@ class blockController {
         icon,
         userId: Number(userId),
       });
-
-      return res.json(block);
+      const response = {
+        data: block
+      };
+      return res.status(200).json(response);
     } catch (e) {
       next(badRequest(e.message));
     }
@@ -22,7 +24,24 @@ class blockController {
     const blocks = await Block.findAll({
       attributes: ["description", "icon", "id"],
     });
-    return res.json(blocks);
+    if (blocks.length === 0){
+      return res.status(200).json({message: "No blocks found"});
+    } 
+    const response = {
+        count: blocks.length,
+        data: blocks.map(block => {
+          return {
+            description: block.description,
+            icon: block.icon,
+            id: block.id,
+            request: {
+              type: "GET",
+              url: "http://localhost:3000/api/block/" + block.id
+            }
+          }
+        }),
+    };
+    return res.status(200).json(response);
   }
 
   async getOne(req, res) {
@@ -35,7 +54,10 @@ class blockController {
     if (!block) {
       return res.status(404).json({ error: "Блок не найден" });
     }
-    return res.json(block);
+    const response = {
+      data: block
+    };
+    return res.status(200).json(response);
   }
 
   async deleteItem(req, res) {
@@ -45,7 +67,10 @@ class blockController {
         id,
       },
     });
-    return res.json(block);
+    const response = {
+      data: block
+    };
+    return res.status(200).json(response);
   }
 
   async getByUser(req, res) {
@@ -55,7 +80,14 @@ class blockController {
         userId,
       },
     });
-    return res.json(blocks);
+    if (blocks.length === 0){
+      return res.status(200).json({message: "No blocks created by this user found"});
+    } 
+    const response = {
+      count: blocks.length,
+      data: blocks,
+  };
+    return res.status(200).json(response);
   }
 
   async updateItem(req, res, next) {
@@ -78,8 +110,10 @@ class blockController {
       if (updated === 0) {
         return res.status(404).send({ error: "Блок не найден" });
       }
-
-      return res.json(updated);
+      const response = {
+        data: updated,
+    };
+      return res.status(200).json(response);
     } catch (e) {
       next(badRequest(e.message));
     }
