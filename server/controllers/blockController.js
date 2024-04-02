@@ -12,7 +12,11 @@ class blockController {
         userId: Number(userId),
       });
       const response = {
-        data: block
+        data: block,
+        request: {
+          type: "GET",
+          url: "http://localhost:3000/api/block/" + block.id
+        }
       };
       return res.status(200).json(response);
     } catch (e) {
@@ -52,7 +56,7 @@ class blockController {
       },
     });
     if (!block) {
-      return res.status(404).json({ error: "Блок не найден" });
+      return res.status(404).json({ error: "Block not found" });
     }
     const response = {
       data: block
@@ -68,7 +72,12 @@ class blockController {
       },
     });
     const response = {
-      data: block
+      message: "Deleted. To get all blocks type this request",
+      request: {
+        type: "GET",
+        url: "http://localhost:3000/api/block",
+      },
+      data: block,
     };
     return res.status(200).json(response);
   }
@@ -85,7 +94,17 @@ class blockController {
     } 
     const response = {
       count: blocks.length,
-      data: blocks,
+      data: blocks.map(block => {
+        return {
+          description: block.description,
+          icon: block.icon,
+          id: block.id,
+          request: {
+            type: "GET",
+            url: "http://localhost:3000/api/block/" + block.id
+          }
+        }
+      }),
   };
     return res.status(200).json(response);
   }
@@ -108,11 +127,15 @@ class blockController {
       );
 
       if (updated === 0) {
-        return res.status(404).send({ error: "Блок не найден" });
+        return res.status(404).send({ error: "Block not found" });
       }
       const response = {
         data: updated,
-    };
+        request: {
+          type: "GET",
+          url: "http://localhost:3000/api/block/" + id,
+        },
+      }
       return res.status(200).json(response);
     } catch (e) {
       next(badRequest(e.message));
