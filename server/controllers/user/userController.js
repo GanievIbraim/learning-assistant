@@ -1,6 +1,4 @@
-const {
-  User
-} = require("../../models/models");
+const { User } = require("../../models/models");
 
 class UserController {
   async deleteUserById(req, res) {
@@ -8,18 +6,23 @@ class UserController {
     try {
       const result = await User.destroy({
         where: {
-          id: Number(id)
-        }
+          id: Number(id),
+        },
       });
       if (result) {
-        console.log(`Пользователь с ID ${id} успешно удален.`);
-        res.json(result)
+        console.log(`User ID ${id} has been succesfuly deleted.`);
+        const response = {
+          message: "User deleted successfully",
+          data: result,
+        };
+        return res.status(200).json(response);
       } else {
-        console.log(`Пользователь с ID ${id} не найден.`);
-        res.json(result)
+        console.log(`User ID ${id} not found.`);
+        return res.status(404).json({ error: "User not found" });
       }
     } catch (error) {
-      console.error('Произошла ошибка при удалении пользователя:', error);
+      console.error("User deletion error", error);
+      return res.status(500).json({ error: "User deletion error" });
     }
   }
   async update(req, res) {
@@ -29,26 +32,27 @@ class UserController {
 
       const foundUser = await User.findOne({
         where: {
-          id: userId
+          id: userId,
         },
       });
 
-      if (!foundUser) return res.status(404).json({
-        "message": "Пользователь не найден"
-      });
+      if (!foundUser) return res.status(404).json({ error: "User not found" });
 
       for (var param in userData) {
-        if (userData[param] == false) { foundUser[param] = "-" }
-        else foundUser[param] = userData[param]
+        if (userData[param] == false) {
+          foundUser[param] = "-";
+        } else foundUser[param] = userData[param];
       }
 
       foundUser.save();
-
-      return res.json(foundUser);
+      const response = {
+        data: foundUser,
+      };
+      return res.status(200).json(response);
     } catch (err) {
-      res.status(404).send({
-        'message': err
-      })
+      res.status(500).send({
+        error: err,
+      });
     }
   }
 
@@ -58,23 +62,27 @@ class UserController {
 
       const foundUser = await User.findOne({
         where: {
-          id: userId
+          id: userId,
         },
       });
 
-      if (!foundUser) return res.status(404).json({
-        "message": "Пользователь не найден"
-      });
+      if (!foundUser)
+        return res.status(404).json({
+          error: "User not found",
+        });
 
-      const { password, refreshToken, createdAt, updatedAt, ...userData } = foundUser.dataValues
-      return res.json(userData);
+      const { password, refreshToken, createdAt, updatedAt, ...userData } =
+        foundUser.dataValues;
+      const response = {
+        data: userData
+      }
+      return res.json(response);
     } catch (err) {
-      res.status(404).send({
-        'message': err
-      })
+      res.status(500).send({
+        error: err,
+      });
     }
   }
-
 }
 
 module.exports = new UserController();
