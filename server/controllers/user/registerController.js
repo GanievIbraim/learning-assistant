@@ -42,9 +42,12 @@ class RegisterController {
           expiresIn: "1d",
         }
       );
+      const response = {
+        data: accessToken,
+      };
 
-      res.json({
-        accessToken,
+      res.status(200).json({
+        response,
       });
 
       const { password, ...userData } = user.dataValues;
@@ -52,7 +55,7 @@ class RegisterController {
     } catch (error) {
       ``;
       res.status(500).json({
-        message: error.message,
+        error: error.message,
       });
     }
   }

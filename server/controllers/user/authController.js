@@ -19,7 +19,7 @@ class AuthController {
       },
     });
 
-    if (!foundUser) return res.status(401).send("empty user"); // Not found or Unauthorized
+    if (!foundUser) return res.status(401).json({message: "empty user"}); // Not found or Unauthorized
 
     const match = await bcrypt.compare(password, foundUser.password);
 
@@ -56,7 +56,7 @@ class AuthController {
         maxAge: 24 * 60 * 60 * 1000,
       });
       res.json({
-        accessToken,
+        data: accessToken,
       });
     } else {
       return res.sendStatus(401);

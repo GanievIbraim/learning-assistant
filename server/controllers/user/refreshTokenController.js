@@ -5,7 +5,9 @@ require("dotenv").config();
 class RefreshTokenController {
   async handleRefreshToken(req, res) {
     const cookies = req.cookies;
-    if (!cookies?.jwt) return res.sendStatus(401);
+    if (!cookies?.jwt) {
+      return res.sendStatus(401).json({ message: "No cookies :(" });
+    }
 
     const refreshToken = cookies.jwt;
 
@@ -16,14 +18,14 @@ class RefreshTokenController {
       },
     });
 
-    if (!foundUser) return res.sendStatus(403); // Forbidden
+    if (!foundUser) return res.sendStatus(403).json({ message: "Access denied" }); // Forbidden
 
     jwt.verify(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET,
       (err, decoded) => {
         if (err || foundUser.email !== decoded.email)
-          return res.sendStatus(403); //res.json({decoded})
+          return res.sendStatus(403).json({ message: "Wrong email" }); //res.json({decoded})
         const accessToken = jwt.sign(
           {
             email: decoded.email,
@@ -34,8 +36,8 @@ class RefreshTokenController {
             expiresIn: "30s",
           }
         );
-        res.json({
-          accessToken,
+        res.status(200).json({
+          data: accessToken,
         });
       }
     );

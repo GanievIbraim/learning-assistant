@@ -3,6 +3,7 @@ const { User } = require("../../models/models");
 class UserController {
   async deleteUserById(req, res) {
     const id = req.body.id;
+    
     try {
       const result = await User.destroy({
         where: {

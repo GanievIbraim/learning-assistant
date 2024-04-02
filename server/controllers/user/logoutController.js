@@ -15,7 +15,7 @@ class LogoutController {
 
     if (!foundUser) {
       res.clearCookie("jwt", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
-      return res.sendStatus(204);
+      return res.sendStatus(404);
     } // Forbidden
 
     // Delete refreshToken in db
