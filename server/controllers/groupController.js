@@ -1,8 +1,7 @@
-const { Group, User } = require("../models");
+const { Group, User } = require("../models/models");
 const { badRequest } = "../error/ApiError";
 
-
-class GroupController {
+class groupController {
   static async create(req, res) {
     try {
       const { name } = req.body;
@@ -63,6 +62,7 @@ class GroupController {
 
   static async getUsers(req, res) {
     try {
+      console.log("getUsers");
       const { id } = req.params;
       const group = await Group.findByPk(id, {
         include: { model: User, as: "users" },
@@ -76,25 +76,31 @@ class GroupController {
   }
   static async addUserToGroup(req, res) {
     try {
+      console.log("addUserToGroup");
+
       const { userId, groupId } = req.body;
       if (!userId || !groupId) {
-        return res.status(400).json({ error: 'UserId and GroupId are required' });
+        return res
+          .status(400)
+          .json({ error: "UserId and GroupId are required" });
       }
-  
+
       // Поиск пользователя и группы, чтобы убедиться, что они существуют
       const user = await User.findByPk(userId);
       const group = await Group.findByPk(groupId);
-  
+
       if (!user || !group) {
-        return res.status(404).json({ error: 'User or Group not found' });
+        return res.status(404).json({ error: "User or Group not found" });
       }
-  
+
       // Добавление пользователя в группу
-      await group.addUser(user); 
-  
-      return res.status(200).json({ message: `User ${userId} added to Group ${groupId}` });
+      await group.addUser(user);
+
+      return res
+        .status(200)
+        .json({ message: `User ${userId} added to Group ${groupId}` });
     } catch (e) {
-        next(badRequest(e.message));
+      next(badRequest(e.message));
     }
   }
 
@@ -102,26 +108,29 @@ class GroupController {
     try {
       const { userId, groupId } = req.body;
       if (!userId || !groupId) {
-        return res.status(400).json({ error: 'UserId and GroupId are required' });
+        return res
+          .status(400)
+          .json({ error: "UserId and GroupId are required" });
       }
-  
+
       // Поиск пользователя и группы, чтобы убедиться, что они существуют
       const user = await User.findByPk(userId);
       const group = await Group.findByPk(groupId);
-  
+
       if (!user || !group) {
-        return res.status(404).json({ error: 'User or Group not found' });
+        return res.status(404).json({ error: "User or Group not found" });
       }
-  
+
       // Удаление пользователя из группы
-      await group.removeUser(user); 
-  
-      return res.status(200).json({ message: `User ${userId} removed from Group ${groupId}` });
+      await group.removeUser(user);
+
+      return res
+        .status(200)
+        .json({ message: `User ${userId} removed from Group ${groupId}` });
     } catch (e) {
-        next(badRequest(e.message));
+      next(badRequest(e.message));
     }
   }
-  
 }
 
-module.exports = new GroupController();
+module.exports = groupController;

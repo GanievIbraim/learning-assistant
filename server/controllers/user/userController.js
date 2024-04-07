@@ -1,7 +1,6 @@
 const { User, Group } = require("../../models/models");
 const { badRequest } = "../error/ApiError";
 
-
 class UserController {
   async deleteUserById(req, res) {
     const id = req.body.id;
@@ -81,17 +80,13 @@ class UserController {
 
   async getUserGroups(req, res) {
     try {
-      const usersWithGroups = await User.findAll({
-        include: [
-          {
-            model: Group,
-            as: "groups",
-          },
-        ],
+      const { id } = req.params;
+      const user = await User.findByPk(id, {
+        include: { model: Group, as: "groups" },
       });
-      console.log(usersWithGroups);
-      // const response = 
-      return res.status(200);
+      return user
+        ? res.status(200).json({ data: user.groups })
+        : res.status(404).json({ error: "User not found" });
     } catch (e) {
       next(badRequest(e.message));
     }

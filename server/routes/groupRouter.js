@@ -10,15 +10,16 @@ const {
   updateItem,
   addUserToGroup,
   removeUserFromGroup,
-} = require("../controllers/cardController.js");
+} = require("../controllers/groupController.js");
 
 router.post("/", create);
 router.get("/", getAll);
 router.get("/:id", getOne);
-router.get("/user/:id", getUsers);
 router.delete("/:id", deleteItem);
 router.delete("/user", removeUserFromGroup); // id передавать в теле запроса
 router.put("/:id", updateItem);
-router.put("/user", addUserToGroup); // id передавать в теле запроса
+router.post("/user", addUserToGroup); // id передавать в теле запроса
+router.get("/user/:id", getUsers);
+
 
 module.exports = router;
