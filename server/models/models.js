@@ -68,9 +68,53 @@ const Block = sequelize.define("Block", {
   },
 });
 
+const Group = sequelize.define("Group", {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+});
+
+const Schedule = sequelize.define("Schedule", {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  startTime: {
+    type: DataTypes.TIME,
+    allowNull: false,
+  },
+  endTime: {
+    type: DataTypes.TIME,
+    allowNull: false,
+  },
+  dayOfWeek: {
+    type: DataTypes.ENUM(
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ),
+    allowNull: false,
+  },
+});
+
 // Связь между таблицами User и Block
 User.hasMany(Block, { as: "blocks", foreignKey: "userId" });
 Block.belongsTo(User, { foreignKey: "userId" });
+
+// Связь многие ко многим между User и Group
+User.belongsToMany(Group, { through: "UserGroups", as: "groups" });
+Group.belongsToMany(User, { through: "UserGroups", as: "users" });
 
 // связь между Block и Card
 Block.hasMany(Card, { as: "cards", foreignKey: "blockId" });
@@ -80,4 +124,6 @@ module.exports = {
   User,
   Card,
   Block,
+  Group,
+  Schedule,
 };

@@ -1,9 +1,10 @@
-const { User } = require("../../models/models");
+const { User, Group } = require("../../models/models");
+const { badRequest } = "../error/ApiError";
+
 
 class UserController {
   async deleteUserById(req, res) {
     const id = req.body.id;
-    
     try {
       const result = await User.destroy({
         where: {
@@ -11,19 +12,14 @@ class UserController {
         },
       });
       if (result) {
-        console.log(`User ID ${id} has been succesfuly deleted.`);
-        const response = {
-          message: "User deleted successfully",
-          data: result,
-        };
-        return res.status(200).json(response);
+        console.log(`Пользователь с ID ${id} успешно удален.`);
+        res.json(result);
       } else {
-        console.log(`User ID ${id} not found.`);
-        return res.status(404).json({ error: "User not found" });
+        console.log(`Пользователь с ID ${id} не найден.`);
+        res.json(result);
       }
     } catch (error) {
-      console.error("User deletion error", error);
-      return res.status(500).json({ error: "User deletion error" });
+      console.error("Произошла ошибка при удалении пользователя:", error);
     }
   }
   async update(req, res) {
@@ -37,7 +33,10 @@ class UserController {
         },
       });
 
-      if (!foundUser) return res.status(404).json({ error: "User not found" });
+      if (!foundUser)
+        return res.status(404).json({
+          message: "Пользователь не найден",
+        });
 
       for (var param in userData) {
         if (userData[param] == false) {
@@ -46,13 +45,11 @@ class UserController {
       }
 
       foundUser.save();
-      const response = {
-        data: foundUser,
-      };
-      return res.status(200).json(response);
+
+      return res.json(foundUser);
     } catch (err) {
-      res.status(500).send({
-        error: err,
+      res.status(404).send({
+        message: err,
       });
     }
   }
@@ -69,19 +66,34 @@ class UserController {
 
       if (!foundUser)
         return res.status(404).json({
-          error: "User not found",
+          message: "Пользователь не найден",
         });
 
       const { password, refreshToken, createdAt, updatedAt, ...userData } =
         foundUser.dataValues;
-      const response = {
-        data: userData
-      }
-      return res.json(response);
+      return res.json(userData);
     } catch (err) {
-      res.status(500).send({
-        error: err,
+      res.status(404).send({
+        message: err,
       });
+    }
+  }
+
+  async getUserGroups(req, res) {
+    try {
+      const usersWithGroups = await User.findAll({
+        include: [
+          {
+            model: Group,
+            as: "groups",
+          },
+        ],
+      });
+      console.log(usersWithGroups);
+      // const response = 
+      return res.status(200);
+    } catch (e) {
+      next(badRequest(e.message));
     }
   }
 }
