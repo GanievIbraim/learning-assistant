@@ -3,16 +3,18 @@ const { badRequest } = "../error/ApiError";
 
 class groupController {
   static async create(req, res) {
-    try {
-      const { name } = req.body;
+    // try {
+      const ownerId = Number(req.body.ownerId);
+      const name = req.body.name;
+      console.log({ name, ownerId });
       if (!name) {
         return res.status(400).json({ error: "Name is required" });
       }
-      const newGroup = await Group.create({ name });
+      const newGroup = await Group.create({ name, ownerId });
       return res.status(201).json({ data: newGroup });
-    } catch (error) {
-      return res.status(500).json({ error: "Internal server error" });
-    }
+    // } catch (error) {
+    //   return res.status(500).json({ error: "Internal server error" });
+    // }
   }
 
   static async getAll(req, res) {

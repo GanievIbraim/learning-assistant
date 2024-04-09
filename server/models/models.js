@@ -78,6 +78,14 @@ const Group = sequelize.define("Group", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  ownerId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Users',
+      key: 'id',
+    },
+  },
 });
 
 const Schedule = sequelize.define("Schedule", {
@@ -115,6 +123,9 @@ Block.belongsTo(User, { foreignKey: "userId" });
 // Связь многие ко многим между User и Group
 User.belongsToMany(Group, { through: "UserGroups", as: "groups" });
 Group.belongsToMany(User, { through: "UserGroups", as: "users" });
+
+Group.belongsTo(User, { as: "owner", foreignKey: "ownerId" });
+User.hasMany(Group, { as: "ownedGroups", foreignKey: "ownerId" });
 
 // связь между Block и Card
 Block.hasMany(Card, { as: "cards", foreignKey: "blockId" });
