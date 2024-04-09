@@ -66,6 +66,9 @@ const Block = sequelize.define("Block", {
   icon: {
     type: DataTypes.STRING(200),
   },
+  color: {
+    type: DataTypes.STRING(200),
+  },
 });
 
 const Group = sequelize.define("Group", {
@@ -82,9 +85,27 @@ const Group = sequelize.define("Group", {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'Users',
-      key: 'id',
+      model: "Users",
+      key: "id",
     },
+  },
+});
+
+// Определение модели Category
+const Category = sequelize.define("Category", {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  icon: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
 });
 
@@ -116,6 +137,9 @@ const Schedule = sequelize.define("Schedule", {
   },
 });
 
+Block.belongsTo(Category, { foreignKey: "categoryId" });
+Category.hasMany(Block, { as: "blocks", foreignKey: "categoryId" });
+
 // Связь между таблицами User и Block
 User.hasMany(Block, { as: "blocks", foreignKey: "userId" });
 Block.belongsTo(User, { foreignKey: "userId" });
@@ -137,4 +161,5 @@ module.exports = {
   Block,
   Group,
   Schedule,
+  Category,
 };

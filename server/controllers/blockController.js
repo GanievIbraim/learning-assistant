@@ -4,19 +4,21 @@ const { badRequest } = require("../error/ApiError");
 class blockController {
   async create(req, res, next) {
     try {
-      let { description, icon, userId } = req.body;
+      let { description, icon, userId, color, categoryId } = req.body;
 
       const block = await Block.create({
         description,
         icon,
         userId: Number(userId),
+        color,
+        categoryId: Number(categoryId),
       });
       const response = {
         data: block,
         request: {
           type: "GET",
-          url: "http://localhost:3000/api/block/" + block.id
-        }
+          url: "http://localhost:3000/api/block/" + block.id,
+        },
       };
       return res.status(200).json(response);
     } catch (e) {
@@ -28,22 +30,24 @@ class blockController {
     const blocks = await Block.findAll({
       attributes: ["description", "icon", "id"],
     });
-    if (blocks.length === 0){
-      return res.status(200).json({message: "No blocks found"});
-    } 
+    if (blocks.length === 0) {
+      return res.status(200).json({ message: "No blocks found" });
+    }
     const response = {
-        count: blocks.length,
-        data: blocks.map(block => {
-          return {
-            description: block.description,
-            icon: block.icon,
-            id: block.id,
-            request: {
-              type: "GET",
-              url: "http://localhost:3000/api/block/" + block.id
-            }
-          }
-        }),
+      count: blocks.length,
+      data: blocks.map((block) => {
+        return {
+          description: block.description,
+          icon: block.icon,
+          id: block.id,
+          color: block.color,
+          categoryId: block.categoryId,
+          request: {
+            type: "GET",
+            url: "http://localhost:3000/api/block/" + block.id,
+          },
+        };
+      }),
     };
     return res.status(200).json(response);
   }
@@ -59,7 +63,7 @@ class blockController {
       return res.status(404).json({ error: "Block not found" });
     }
     const response = {
-      data: block
+      data: block,
     };
     return res.status(200).json(response);
   }
@@ -89,35 +93,69 @@ class blockController {
         userId,
       },
     });
-    if (blocks.length === 0){
-      return res.status(200).json({message: "No blocks created by this user found"});
-    } 
+    if (blocks.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "No blocks created by this user found" });
+    }
     const response = {
       count: blocks.length,
-      data: blocks.map(block => {
+      data: blocks.map((block) => {
         return {
           description: block.description,
           icon: block.icon,
           id: block.id,
           request: {
             type: "GET",
-            url: "http://localhost:3000/api/block/" + block.id
-          }
-        }
+            url: "http://localhost:3000/api/block/" + block.id,
+          },
+        };
       }),
-  };
+    };
     return res.status(200).json(response);
+  }
+  async getbyCategory(req, res) {
+    try {
+      const { categoryId } = req.params;
+      const blocks = await Block.findAll({
+        where: {
+          categoryId,
+        },
+      });
+      if (blocks.length === 0) {
+        return res.status(200).json({ message: "No blocks found" });
+      }
+      const response = {
+        count: blocks.length,
+        data: blocks.map((block) => {
+          return {
+            description: block.description,
+            icon: block.icon,
+            id: block.id,
+            request: {
+              type: "GET",
+              url: "http://localhost:3000/api/block/" + block.id,
+            },
+          };
+        }),
+      };
+      return res.status(200).json(response);
+    } catch (e) {
+      next(badRequest(e.message));
+    }
   }
 
   async updateItem(req, res, next) {
     try {
-      let { description, icon, userId, id } = req.body;
+      let { description, icon, userId, color, id, categoryId } = req.body;
 
       const [updated] = await Block.update(
         {
           description,
           icon,
           userId,
+          color,
+          categoryId,
         },
         {
           where: {
@@ -135,7 +173,7 @@ class blockController {
           type: "GET",
           url: "http://localhost:3000/api/block/" + id,
         },
-      }
+      };
       return res.status(200).json(response);
     } catch (e) {
       next(badRequest(e.message));
