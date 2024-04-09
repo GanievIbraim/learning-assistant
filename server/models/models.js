@@ -137,6 +137,11 @@ const Schedule = sequelize.define("Schedule", {
   },
 });
 
+// Связь многие ко многим между User и Group
+User.belongsToMany(Block, { through: "ViewedBlocks", as: "viewedBlocks" });
+Block.belongsToMany(User, { through: "ViewedBlocks", as: "users" });
+
+
 Block.belongsTo(Category, { foreignKey: "categoryId" });
 Category.hasMany(Block, { as: "blocks", foreignKey: "categoryId" });
 

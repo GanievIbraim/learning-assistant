@@ -64,7 +64,6 @@ class groupController {
 
   static async getUsers(req, res) {
     try {
-      console.log("getUsers");
       const { id } = req.params;
       const group = await Group.findByPk(id, {
         include: { model: User, as: "users" },
@@ -78,7 +77,6 @@ class groupController {
   }
   static async addUserToGroup(req, res) {
     try {
-      console.log("addUserToGroup");
 
       const { userId, groupId } = req.body;
       if (!userId || !groupId) {

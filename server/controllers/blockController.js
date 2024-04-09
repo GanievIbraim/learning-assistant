@@ -1,4 +1,4 @@
-const { Block } = require("../models/models");
+const { User, Block } = require("../models/models");
 const { badRequest } = require("../error/ApiError");
 
 class blockController {
@@ -177,6 +177,48 @@ class blockController {
       return res.status(200).json(response);
     } catch (e) {
       next(badRequest(e.message));
+    }
+  }
+  async getViewedBlocksByUserId(req, res) {
+    try {
+      const { id } = req.params;
+      const user = await User.findByPk(id, {
+        include: { model: Block, as: "viewedBlocks" },
+      });
+      console.log(user);
+      return user
+        ? res.status(200).json({ data: user.viewedBlocks })
+        : res.status(404).json({ error: "User not found" });
+    } catch (e) {
+      res.status(500).json({ error: e.message });
+    }
+  }
+
+  async addBlockToViewed(req, res) {
+    try {
+      const { userId, blockId } = req.body;
+      if (!userId || !blockId) {
+        return res
+          .status(400)
+          .json({ error: "UserId and BlockId are required" });
+      }
+
+      // Поиск пользователя и блока, чтобы убедиться, что они существуют
+      const user = await User.findByPk(userId);
+      const block = await Block.findByPk(blockId);
+
+      if (!user || !block) {
+        return res.status(404).json({ error: "User or Block not found" });
+      }
+
+      // Добавление пользователя в группу
+      await user.addBlock(block);
+
+      return res
+        .status(200)
+        .json({ message: `Block ${blockId} added to User ${userId} ` });
+    } catch (e) {
+      res.status(500).json({ error: e.message });
     }
   }
 }
