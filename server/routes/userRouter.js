@@ -14,5 +14,6 @@ router.get("/logout", LogoutController.handleLogout);
 router.put("/update", verifyJWT, userController.update);
 router.get("/myprofile", verifyJWT, userController.getProfile);
 router.delete("/userdel", userController.deleteUserById)
+router.get("/groups/:id", userController.getUserGroups)
 
 module.exports = router

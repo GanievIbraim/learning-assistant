@@ -66,11 +66,95 @@ const Block = sequelize.define("Block", {
   icon: {
     type: DataTypes.STRING(200),
   },
+  color: {
+    type: DataTypes.STRING(200),
+  },
 });
+
+const Group = sequelize.define("Group", {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  ownerId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: "Users",
+      key: "id",
+    },
+  },
+});
+
+// Определение модели Category
+const Category = sequelize.define("Category", {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  icon: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+});
+
+const Schedule = sequelize.define("Schedule", {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  startTime: {
+    type: DataTypes.TIME,
+    allowNull: false,
+  },
+  endTime: {
+    type: DataTypes.TIME,
+    allowNull: false,
+  },
+  dayOfWeek: {
+    type: DataTypes.ENUM(
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ),
+    allowNull: false,
+  },
+});
+
+// Связь многие ко многим между User и Group
+User.belongsToMany(Block, { through: "ViewedBlocks", as: "viewedBlocks" });
+Block.belongsToMany(User, { through: "ViewedBlocks", as: "users" });
+
+
+Block.belongsTo(Category, { foreignKey: "categoryId" });
+Category.hasMany(Block, { as: "blocks", foreignKey: "categoryId" });
 
 // Связь между таблицами User и Block
 User.hasMany(Block, { as: "blocks", foreignKey: "userId" });
 Block.belongsTo(User, { foreignKey: "userId" });
+
+// Связь многие ко многим между User и Group
+User.belongsToMany(Group, { through: "UserGroups", as: "groups" });
+Group.belongsToMany(User, { through: "UserGroups", as: "users" });
+
+Group.belongsTo(User, { as: "owner", foreignKey: "ownerId" });
+User.hasMany(Group, { as: "ownedGroups", foreignKey: "ownerId" });
 
 // связь между Block и Card
 Block.hasMany(Card, { as: "cards", foreignKey: "blockId" });
@@ -80,4 +164,7 @@ module.exports = {
   User,
   Card,
   Block,
+  Group,
+  Schedule,
+  Category,
 };

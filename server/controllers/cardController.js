@@ -1,5 +1,5 @@
 const { Card } = require("../models/models");
-const { badRequest } = "../error/ApiError";
+const { badRequest } = require("../error/ApiError");
 
 class cardController {
   async create(req, res, next) {
@@ -12,8 +12,10 @@ class cardController {
         translation,
         blockId: Number(blockId),
       });
-
-      return res.json(card);
+      const response = {
+        data: card,
+      };
+      return res.status(200).json(response);
     } catch (e) {
       next(badRequest(e.message));
     }
@@ -23,7 +25,25 @@ class cardController {
     const cards = await Card.findAll({
       attributes: ["text", "icon", "translation", "id"],
     });
-    return res.json(cards);
+    if (cards.length === 0) {
+      return res.status(200).json({ message: "No cards found" });
+    }
+    const response = {
+      count: cards.length,
+      data: cards.map((card) => {
+        return {
+          text: card.text,
+          icon: card.icon,
+          translation: card.translation,
+          id: card.id,
+          request: {
+            type: "GET",
+            url: "http://localhost:3000/api/card/" + card.id,
+          },
+        };
+      }),
+    };
+    return res.status(200).json(response);
   }
 
   async getOne(req, res) {
@@ -34,9 +54,12 @@ class cardController {
       },
     });
     if (!card) {
-      return res.status(404).json({ error: "Карточка не найдена" });
+      return res.status(404).json({ error: "Card not found" });
     }
-    return res.json(card);
+    const response = {
+      data: card,
+    };
+    return res.status(200).json(response);
   }
 
   async getByBlock(req, res) {
@@ -46,10 +69,26 @@ class cardController {
         blockId,
       },
     });
-    if (!cards) {
-      return res.status(404).json({ error: "Карточки не найдены" });
+    if (!cards || !cards.length) {
+      return res.status(404).json({ error: "No cards in this block" });
     }
-    return res.json(cards);
+
+    const response = {
+      count: cards.length,
+      data: cards.map((card) => {
+        return {
+          text: card.text,
+          icon: card.icon,
+          translation: card.translation,
+          id: card.id,
+          request: {
+            type: "GET",
+            url: "http://localhost:3000/api/card/" + card.id,
+          },
+        };
+      }),
+    };
+    return res.status(200).json(response);
   }
 
   async deleteItem(req, res) {
@@ -59,7 +98,15 @@ class cardController {
         id,
       },
     });
-    return res.json(card);
+    const response = {
+      message: "Deleted. To get all cards type this request",
+      request: {
+        type: "GET",
+        url: "http://localhost:3000/api/card",
+      },
+      data: card,
+    };
+    return res.status(200).json(response);
   }
 
   async updateItem(req, res, next) {
@@ -80,10 +127,16 @@ class cardController {
       );
 
       if (updated === 0) {
-        return res.status(404).send({ error: "Карточка не найдена" });
+        return res.status(404).send({ error: "Card not found" });
       }
-
-      return res.json(updated);
+      const response = {
+        data: updated,
+        request: {
+          type: "GET",
+          url: "http://localhost:3000/api/card/" + id,
+        },
+      }
+      return res.status(200).json(response);
     } catch (e) {
       next(badRequest(e.message));
     }
